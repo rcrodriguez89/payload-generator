@@ -1,0 +1,19 @@
+# Gradle
+.gradle/
+build/
+out/
+
+# Generated payloads
+generated-payload/
+payload*.json
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+
+# OS files
+.DS_Store
+
+# Logs
+*.log

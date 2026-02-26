@@ -1,0 +1,95 @@
+type: array
+count: 10
+item:
+  type: object
+  properties:
+    id:
+      type: long
+      min: 1
+      max: 999999999
+      seq: true
+    firstName:
+      generator: firstName
+    lastName:
+      generator: lastName
+    fullName:
+      generator: fullName
+    email:
+      generator: email
+      #domain: vibecoding.dev
+    rut:
+      generator: chileanRut
+      #omitGroupSeparator: true
+    accountNumber:
+      generator: accountNumber
+      length: 16
+      prefix: "52"
+      checkDigit: luhn
+      grouping: 4
+      separator: "-"
+    country:
+      generator: country
+    city:
+      generator: city
+    active:
+      type: boolean
+    score:
+      type: int
+      min: 1
+      max: 100
+    amount:
+      type: decimal
+      min: 10.50
+      max: 9999.95
+      scale: 2
+    externalId:
+      type: uuid
+    createdAt:
+      type: instant
+      pastOrPresent: true
+    nextBillingDate:
+      type: date
+      future: true
+    birthDate:
+      type: date
+      pastOrPresent: true
+      min: 1980-01-01
+    nickname:
+      type: string
+      length: 8
+      charset: alphanumeric
+      nullable: true
+      nullProbability: 0.2
+    accountType:
+      type: string
+      default: standard
+    auditPayload:
+      type: stringTemplate
+      properties:
+        source:
+          type: string
+          default: payload-generator
+        eventType:
+          type: string
+          default: CREATED
+        amount:
+          type: decimal
+          min: 10
+          max: 10
+          scale: 2
+        metadata:
+          type: object
+          properties:
+            channel:
+              type: string
+              default: api
+            processed:
+              type: boolean
+              default: true
+    tags:
+      type: array
+      count: 3
+      item:
+        type: string
+        length: 6
+        charset: lower

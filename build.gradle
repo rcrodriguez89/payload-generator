@@ -1,0 +1,133 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'jacoco'
+    id 'checkstyle'
+    id 'pmd'
+    id 'com.github.spotbugs' version '6.0.26'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+group = 'ni.org.jneurosoft'
+version = '1.0.0'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.2'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.17.2'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+}
+
+application {
+    mainClass = 'ni.org.jneurosoft.payload.generator.PayloadGeneratorApplication'
+}
+
+ext {
+    notifierChecksDir = project.findProperty('notifierChecksDir')
+        ? file(project.property('notifierChecksDir'))
+        : file("$rootDir/checks")
+}
+
+jacoco {
+    toolVersion = '0.8.12'
+}
+
+checkstyle {
+    toolVersion = '10.25.0'
+    configFile = file("${notifierChecksDir}/checkstyle.xml")
+    configProperties = [
+        'checkstyle.suppressions.file': file("${notifierChecksDir}/checkstyle-suppressions.xml").absolutePath
+    ]
+    ignoreFailures = false
+}
+
+tasks.withType(Checkstyle).configureEach {
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+pmd {
+    toolVersion = '7.14.0'
+    ruleSets = []
+    ruleSetFiles = files("${notifierChecksDir}/pmd-ruleset.xml")
+    ignoreFailures = false
+    consoleOutput = true
+}
+
+tasks.withType(Pmd).configureEach {
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+spotbugs {
+    toolVersion = '4.9.8'
+    excludeFilter = file("${notifierChecksDir}/spotbugs-exclude.xml")
+    ignoreFailures = false
+}
+
+tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach {
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+    finalizedBy tasks.jacocoTestReport
+}
+
+tasks.jacocoTestReport {
+    dependsOn tasks.test
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
+}
+
+tasks.jacocoTestCoverageVerification {
+    dependsOn tasks.test
+    violationRules {
+        rule {
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.85
+            }
+        }
+    }
+}
+
+tasks.named('check') {
+    dependsOn tasks.jacocoTestCoverageVerification
+    dependsOn tasks.checkstyleMain
+    dependsOn tasks.pmdMain
+    dependsOn tasks.spotbugsMain
+}
+
+tasks.named('shadowJar') {
+    archiveFileName = 'payload-generator.jar'
+}
+
+tasks.named('jar') {
+    enabled = false
+}
+
+tasks.named('build') {
+    dependsOn tasks.named('shadowJar')
+}

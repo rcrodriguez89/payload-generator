@@ -1,0 +1,11 @@
+type: array
+count: 5
+item:
+  type: object
+  properties:
+    firstName:
+      generator: firstName
+    lastName:
+      generator: lastName
+    email:
+      generator: email
