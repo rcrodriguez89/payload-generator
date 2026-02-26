@@ -55,10 +55,25 @@ Comando unico para ejecutar todos los tasks de calidad:
 ./gradlew checkstyleMain checkstyleTest pmdMain pmdTest spotbugsMain spotbugsTest
 ```
 
+Stages del pipeline en GitHub Actions:
+
+- `build`
+- `test`
+- `coverage`
+- `checkstyle`
+- `spotBugs`
+- `pmd`
+
 Tambien puedes ejecutar todo el pipeline con:
 
 ```bash
 ./gradlew check
+```
+
+Script local para verificar el pipeline completo:
+
+```bash
+./scripts/verify-pipeline-local.sh
 ```
 
 Reportes generados:
@@ -113,6 +128,7 @@ Escalares:
 - `boolean`
 - `uuid`
 - `instant` (ISO-8601)
+- `epoch` (numero long con epoch millis actual)
 - `date` (YYYY-MM-DD)
 - `nullable` + `nullProbability`
 - `default` (si existe, se usa este valor y no se calcula aleatoriamente)
@@ -192,6 +208,8 @@ item:
     createdAt:
       type: instant
       pastOrPresent: true
+    createdAtEpoch:
+      type: epoch
     nextDueDate:
       type: date
       future: true

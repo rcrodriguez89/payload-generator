@@ -47,6 +47,8 @@ item:
     createdAt:
       type: instant
       pastOrPresent: true
+    createdAtEpoch:
+      type: epoch
     nextBillingDate:
       type: date
       future: true

@@ -72,6 +72,7 @@ public final class StreamingPayloadWriter {
       case "uuid" -> generator.writeString(randomUuid(context));
       case "instant" -> generator.writeString(randomInstant(node, context));
       case "date" -> generator.writeString(randomDate(node, context));
+      case "epoch" -> generator.writeNumber(currentEpochMillis());
       default -> throw new IllegalArgumentException("Tipo no soportado: " + type + " en " + path);
     }
   }
@@ -277,6 +278,10 @@ public final class StreamingPayloadWriter {
     long maxEpoch = max.toEpochDay();
     long day = context.randomLong(minEpoch, maxEpoch);
     return LocalDate.ofEpochDay(day).format(DateTimeFormatter.ISO_LOCAL_DATE);
+  }
+
+  private static long currentEpochMillis() {
+    return Instant.now().toEpochMilli();
   }
 
   private static String normalizeSequencePath(String path) {

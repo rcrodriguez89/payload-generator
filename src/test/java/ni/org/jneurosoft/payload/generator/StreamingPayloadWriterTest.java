@@ -55,14 +55,19 @@ class StreamingPayloadWriterTest {
             "dateNumStr": {"type": "date", "min": "1", "max": "1"},
             "dateIso": {"type": "date", "min": "2020-02-02", "max": "2020-02-02"},
             "dateFallback": {"type": "date"},
+            "epochNow": {"type": "epoch"},
             "nullableAlwaysNull": {"type": "string", "nullable": true, "nullProbability": 1.0},
             "generated": {"generator": "firstName"},
             "blankType": {"type": "   ", "length": 2, "charset": "upper"}
           }
         }
         """);
-
+    Instant beforeEpoch = Instant.now().minusSeconds(1);
     JsonNode root = MAPPER.readTree(generate(template, null, 123L));
+    Instant afterEpoch = Instant.now().plusSeconds(1);
+    long epochNow = root.get("epochNow").asLong();
+    assertTrue(epochNow >= beforeEpoch.toEpochMilli());
+    assertTrue(epochNow <= afterEpoch.toEpochMilli());
 
     assertTrue(root.get("s1").asText().matches("\\d{5}"));
     assertTrue(root.get("s2").asText().matches("[XYZ]{3}"));
