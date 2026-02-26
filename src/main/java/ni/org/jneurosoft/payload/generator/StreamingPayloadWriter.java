@@ -363,21 +363,59 @@ public final class StreamingPayloadWriter {
     if (node == null || node.isNull()) {
       return defaultValue;
     }
-    return node.decimalValue();
+
+    if (node.isNumber()) {
+      return node.decimalValue();
+    }
+
+    String raw = node.asText();
+    if (raw == null || raw.isBlank()) {
+      return defaultValue;
+    }
+
+    return new BigDecimal(raw);
   }
 
   private static Instant instantOrDefault(JsonNode node, Instant defaultValue) {
     if (node == null || node.isNull()) {
       return defaultValue;
     }
-    return Instant.parse(node.asText());
+
+    if (node.isIntegralNumber()) {
+      return Instant.ofEpochSecond(node.longValue());
+    }
+
+    String raw = node.asText();
+    if (raw == null || raw.isBlank()) {
+      return defaultValue;
+    }
+
+    if (raw.matches("^-?\\d+$")) {
+      return Instant.ofEpochMilli(Long.parseLong(raw));
+    }
+
+    return Instant.parse(raw);
   }
 
   private static LocalDate localDateOrDefault(JsonNode node, LocalDate defaultValue) {
     if (node == null || node.isNull()) {
       return defaultValue;
     }
-    return LocalDate.parse(node.asText());
+
+    if (node.isIntegralNumber()) {
+      return LocalDate.ofEpochDay(node.longValue());
+    }
+
+    String raw = node.asText();
+    if (raw == null || raw.isBlank()) {
+      return defaultValue;
+    }
+
+    if (raw.matches("^-?\\d+$")) {
+      return LocalDate.ofEpochDay(Long.parseLong(raw));
+    }
+
+    return LocalDate.parse(raw);
   }
 
   private static String textOrNull(JsonNode node) {
